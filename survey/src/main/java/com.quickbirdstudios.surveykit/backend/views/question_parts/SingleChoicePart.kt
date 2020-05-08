@@ -5,19 +5,21 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.LinearLayout
+import android.widget.LinearLayout.LayoutParams.MATCH_PARENT
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.annotation.ColorInt
-import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
-import com.quickbirdstudios.survey.R
+import com.quickbirdstudios.surveykit.R
 import com.quickbirdstudios.surveykit.SurveyTheme
 import com.quickbirdstudios.surveykit.TextChoice
 import com.quickbirdstudios.surveykit.backend.helpers.extensions.px
 import com.quickbirdstudios.surveykit.backend.views.main_parts.StyleablePart
 import com.quickbirdstudios.surveykit.backend.views.question_parts.helper.BackgroundDrawable
+import com.quickbirdstudios.surveykit.backend.views.question_parts.helper.BackgroundDrawable.Border.Both
+import com.quickbirdstudios.surveykit.backend.views.question_parts.helper.BackgroundDrawable.Border.Bottom
 import com.quickbirdstudios.surveykit.backend.views.question_parts.helper.createSelectableThemedBackground
 
 internal class SingleChoicePart @JvmOverloads constructor(
@@ -84,8 +86,7 @@ internal class SingleChoicePart @JvmOverloads constructor(
         val selectedChoice = selected
         this.removeAllViews()
         list.forEachIndexed { index, textChoice ->
-            val item = if (index == list.size - 1) createLastRadioButton(textChoice.text, index)
-            else createRadioButton(textChoice.text, index)
+            val item = createRadioButton(textChoice.text, index, if (index == 0) Both else Bottom)
             if (textChoice == selectedChoice) {
                 item.isChecked = true
                 item.setTextColor(radioButtonTextColor)
@@ -120,7 +121,11 @@ internal class SingleChoicePart @JvmOverloads constructor(
 
     //region RadioButton Creation Helpers
 
-    private fun createRadioButton(@StringRes label: Int, tag: Int): RadioButton {
+    private fun createRadioButton(
+        label: String,
+        tag: Int,
+        border: BackgroundDrawable.Border
+    ): RadioButton {
         val verticalPaddingEditText = context.px(
             context.resources.getDimension(R.dimen.text_field_vertical_padding)
         ).toInt()
@@ -139,9 +144,8 @@ internal class SingleChoicePart @JvmOverloads constructor(
             isClickable = true
             buttonDrawable = null
             textSize = 20f
-            background = createSelectableThemedBackground(
-                context, BackgroundDrawable.Border.Top, themeColor
-            )
+
+            background = createSelectableThemedBackground(context, border, themeColor)
 
             setPadding(
                 horizontalPaddingEditTextLeft,
@@ -150,25 +154,16 @@ internal class SingleChoicePart @JvmOverloads constructor(
                 verticalPaddingEditText
             )
 
-            val layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
+            val layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
             this.layoutParams = layoutParams
         }
     }
-
-    private fun createLastRadioButton(@StringRes label: Int, tag: Int) =
-        createRadioButton(label, tag).apply {
-            background = createSelectableThemedBackground(
-                context, BackgroundDrawable.Border.Both, themeColor
-            )
-        }
 
     //endregion
 
 
     init {
+        this.id = R.id.singleChoicePart
         this.gravity = Gravity.CENTER
 
         this.setOnCheckedChangeListener { group, checkedId ->

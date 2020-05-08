@@ -10,14 +10,15 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import androidx.annotation.ColorInt
-import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
-import com.quickbirdstudios.survey.R
+import com.quickbirdstudios.surveykit.R
 import com.quickbirdstudios.surveykit.SurveyTheme
 import com.quickbirdstudios.surveykit.TextChoice
 import com.quickbirdstudios.surveykit.backend.helpers.extensions.px
 import com.quickbirdstudios.surveykit.backend.views.main_parts.StyleablePart
 import com.quickbirdstudios.surveykit.backend.views.question_parts.helper.BackgroundDrawable
+import com.quickbirdstudios.surveykit.backend.views.question_parts.helper.BackgroundDrawable.Border.Both
+import com.quickbirdstudios.surveykit.backend.views.question_parts.helper.BackgroundDrawable.Border.Bottom
 import com.quickbirdstudios.surveykit.backend.views.question_parts.helper.createSelectableThemedBackground
 
 internal class MultipleChoicePart @JvmOverloads constructor(
@@ -84,8 +85,7 @@ internal class MultipleChoicePart @JvmOverloads constructor(
         val selectedChoices = selected
         this.removeAllViews()
         list.forEachIndexed { index, textChoice ->
-            val item = if (index == list.size - 1) createLastCheckBox(textChoice.text, index)
-            else createCheckBox(textChoice.text, index)
+            val item = createCheckBox(textChoice.text, index, if (index == 0) Both else Bottom)
             if (selectedChoices.contains(textChoice)) {
                 item.isChecked = true
                 item.setTextColor(checkBoxTextColor)
@@ -118,7 +118,11 @@ internal class MultipleChoicePart @JvmOverloads constructor(
 
     //region Checkbox Creation Helpers
 
-    private fun createCheckBox(@StringRes label: Int, tag: Int): CheckBox {
+    private fun createCheckBox(
+        label: String,
+        tag: Int,
+        border: BackgroundDrawable.Border
+    ): CheckBox {
         val verticalPaddingEditText = context.px(
             context.resources.getDimension(R.dimen.text_field_vertical_padding)
         ).toInt()
@@ -131,12 +135,15 @@ internal class MultipleChoicePart @JvmOverloads constructor(
 
         val checkBox = CheckBox(context).apply {
             id = View.generateViewId()
-            setText(label)
+            text = label
             this.tag = tag
             isFocusable = true
             isClickable = true
             buttonDrawable = null
             textSize = 20f
+
+            background = createSelectableThemedBackground(context, border, themeColor)
+
             setOnClickListener { internalCheckedChangeListener(this, this.isChecked) }
 
             setPadding(
@@ -155,21 +162,11 @@ internal class MultipleChoicePart @JvmOverloads constructor(
 
         Handler().post {
             checkBox.background = checkBox.createSelectableThemedBackground(
-                context, BackgroundDrawable.Border.Top, themeColor
+                context, Both, themeColor
             )
         }
 
         return checkBox
-    }
-
-    private fun createLastCheckBox(@StringRes label: Int, tag: Int): CheckBox {
-        val createCheckBox = createCheckBox(label, tag)
-        Handler().post {
-            createCheckBox.background = createCheckBox.createSelectableThemedBackground(
-                context, BackgroundDrawable.Border.Both, themeColor
-            )
-        }
-        return createCheckBox
     }
 
     //endregion
@@ -177,6 +174,7 @@ internal class MultipleChoicePart @JvmOverloads constructor(
 
     init {
         this.let {
+            id = R.id.multipleChoicePart
             gravity = Gravity.CENTER
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
             orientation = VERTICAL

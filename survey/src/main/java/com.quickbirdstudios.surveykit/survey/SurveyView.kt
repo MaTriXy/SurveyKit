@@ -39,8 +39,7 @@ class SurveyView @JvmOverloads constructor(
     //TODO theme should be not set here but when creating the survey
     override fun start(task: Task, surveyTheme: SurveyTheme) {
         taskNavigator = TaskNavigator(task = task)
-        resultGatherer =
-            ResultGathererImpl(task = task)
+        resultGatherer = ResultGathererImpl(task = task)
         presenter = PresenterImpl(
             context = context,
             surveyTheme = surveyTheme,
@@ -115,8 +114,7 @@ class SurveyView @JvmOverloads constructor(
             )
 
         val stepResult = resultGatherer.retrieve(firstStep.id)
-        val result = presenter.present(Presenter.Transition.None, firstStep, stepResult)
-            .storeResult()
+        val result = presenter(Presenter.Transition.None, firstStep, stepResult).storeResult()
         return StepData(
             step = firstStep,
             action = result
@@ -127,7 +125,7 @@ class SurveyView @JvmOverloads constructor(
         val newStep = taskNavigator.nextStep(step, result) ?: return StepData(
             FinishReason.Completed
         )
-        val newResult = presenter.present(
+        val newResult = presenter(
             Presenter.Transition.SlideFromRight, newStep, resultGatherer.retrieve(newStep.id)
         ).storeResult()
         return StepData(
@@ -141,7 +139,7 @@ class SurveyView @JvmOverloads constructor(
             taskNavigator.previousStep(step) ?: return StepData(
                 FinishReason.Failed
             )
-        val newResult = presenter.present(
+        val newResult = presenter(
             Presenter.Transition.SlideFromLeft,
             previousStep,
             resultGatherer.retrieve(previousStep.id)
@@ -156,7 +154,7 @@ class SurveyView @JvmOverloads constructor(
         val newStep = taskNavigator.nextStep(step) ?: return StepData(
             FinishReason.Completed
         )
-        val newResult = presenter.present(
+        val newResult = presenter(
             Presenter.Transition.SlideFromRight, newStep, resultGatherer.retrieve(newStep.id)
         ).storeResult()
         return StepData(

@@ -9,18 +9,16 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
-import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import com.quickbirdstudios.survey.R
+import com.quickbirdstudios.surveykit.R
 import com.quickbirdstudios.surveykit.SurveyTheme
 import com.quickbirdstudios.surveykit.backend.helpers.extensions.colorStroke
 import com.quickbirdstudios.surveykit.backend.helpers.extensions.px
 
 class Footer @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleRes: Int = 0
-) : Toolbar(context, attrs, defStyleRes),
-    StyleablePart {
+) : Toolbar(context, attrs, defStyleRes), StyleablePart {
 
 
     //region Public API
@@ -47,7 +45,9 @@ class Footer @JvmOverloads constructor(
         }
 
 
-    fun setContinueButtonText(@StringRes text: Int) = buttonContinue.setText(text)
+    fun setContinueButtonText(text: String) {
+        buttonContinue.text = text
+    }
 
     var onContinue: () -> Unit = {}
     var onSkip: () -> Unit = {}

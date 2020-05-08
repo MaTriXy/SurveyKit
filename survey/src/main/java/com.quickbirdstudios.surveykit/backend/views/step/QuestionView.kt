@@ -2,63 +2,27 @@ package com.quickbirdstudios.surveykit.backend.views.step
 
 import android.content.Context
 import android.view.View
-import android.widget.FrameLayout
 import androidx.annotation.CallSuper
-import androidx.annotation.StringRes
-import com.quickbirdstudios.survey.R
 import com.quickbirdstudios.surveykit.FinishReason
+import com.quickbirdstudios.surveykit.R
 import com.quickbirdstudios.surveykit.StepIdentifier
 import com.quickbirdstudios.surveykit.SurveyTheme
-import com.quickbirdstudios.surveykit.backend.views.main_parts.*
-import com.quickbirdstudios.surveykit.backend.views.question_parts.InfoText
+import com.quickbirdstudios.surveykit.backend.views.main_parts.Content
+import com.quickbirdstudios.surveykit.backend.views.main_parts.Dialogs
+import com.quickbirdstudios.surveykit.backend.views.main_parts.Footer
+import com.quickbirdstudios.surveykit.backend.views.main_parts.Header
+import com.quickbirdstudios.surveykit.backend.views.question_parts.InfoTextPart
 import com.quickbirdstudios.surveykit.result.QuestionResult
 import java.util.*
-
-// TODO rename and move to own file
-abstract class StepView(
-    context: Context,
-    override val id: StepIdentifier,
-    override val isOptional: Boolean
-) : FrameLayout(context), ViewActions,
-    StyleablePart {
-
-    protected var onNextListener: (QuestionResult) -> Unit = {}
-    override fun onNext(block: (QuestionResult) -> Unit) {
-        onNextListener = block
-    }
-
-    protected var onBackListener: (QuestionResult) -> Unit = {}
-    override fun onBack(block: (QuestionResult) -> Unit) {
-        onBackListener = block
-    }
-
-    protected var onCloseListener: (QuestionResult, FinishReason) -> Unit = { _, _ -> }
-    override fun onClose(block: (QuestionResult, FinishReason) -> Unit) {
-        onCloseListener = block
-    }
-
-    protected var onSkipListener: () -> Unit = {}
-    override fun onSkip(block: () -> Unit) {
-        onSkipListener = block
-    }
-
-    override fun back() = onBackListener(createResults())
-
-    abstract fun setupViews()
-    open fun onViewCreated() = Unit
-}
 
 abstract class QuestionView(
     context: Context,
     id: StepIdentifier,
     isOptional: Boolean,
-    @StringRes private val title: Int?,
-    @StringRes private val text: Int?,
-    @StringRes private val nextButtonText: Int
-) : StepView(context, id, isOptional),
-    ViewActions,
-    Stateful {
-
+    private val title: String?,
+    private val text: String?,
+    private val nextButtonText: String
+) : StepView(context, id, isOptional), ViewActions {
 
     //region Members
 
@@ -86,8 +50,6 @@ abstract class QuestionView(
 
     abstract override fun createResults(): QuestionResult
 
-    override var state: QuestionResult? = null
-
     abstract override fun isValidInput(): Boolean
 
     //endregion
@@ -97,8 +59,8 @@ abstract class QuestionView(
 
     @CallSuper
     override fun setupViews() {
-        title?.let { InfoText.title(context, it) }?.let(content::add)
-        text?.let { InfoText.info(context, it) }?.let(content::add)
+        title?.let { InfoTextPart.title(context, it) }?.let(content::add)
+        text?.let { InfoTextPart.info(context, it) }?.let(content::add)
 
         header.onBack = { onBackListener(createResults()) }
         //TODO add translations and move out of this class
@@ -123,8 +85,6 @@ abstract class QuestionView(
         footer.onSkip = { onSkipListener() }
         footer.questionCanBeSkipped = isOptional
         footer.setContinueButtonText(nextButtonText)
-
-        setState()
     }
 
     //endregion

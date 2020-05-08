@@ -6,21 +6,19 @@ import android.util.AttributeSet
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.LinearLayout
-import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
-import com.quickbirdstudios.survey.R
+import com.quickbirdstudios.surveykit.R
 import com.quickbirdstudios.surveykit.SurveyTheme
 import com.quickbirdstudios.surveykit.backend.helpers.extensions.px
 import com.quickbirdstudios.surveykit.backend.views.main_parts.StyleablePart
 
-internal open class TextField @JvmOverloads constructor(
+internal open class TextFieldPart @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleRes: Int = 0
-) : LinearLayout(context, attrs, defStyleRes),
-    StyleablePart {
+) : LinearLayout(context, attrs, defStyleRes), StyleablePart {
 
     override fun style(surveyTheme: SurveyTheme) {}
 
-    var field: EditText
+    val field: EditText
 
     init {
         val verticalPaddingEditText = context.px(
@@ -31,6 +29,7 @@ internal open class TextField @JvmOverloads constructor(
         ).toInt()
 
         field = EditText(context).apply {
+            id = R.id.textFieldPartField
             inputType = InputType.TYPE_CLASS_TEXT
             isFocusable = true
             isFocusableInTouchMode = true
@@ -59,10 +58,8 @@ internal open class TextField @JvmOverloads constructor(
     }
 
     companion object {
-        fun withHint(context: Context, @StringRes hint: Int) = TextField(
-            context
-        ).apply {
-            field.hint = context.getString(hint)
+        fun withHint(context: Context, hint: String) = TextFieldPart(context).apply {
+            field.hint = hint
         }
     }
 }

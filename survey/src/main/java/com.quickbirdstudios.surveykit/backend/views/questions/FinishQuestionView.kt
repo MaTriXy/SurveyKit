@@ -1,20 +1,21 @@
 package com.quickbirdstudios.surveykit.backend.views.questions
 
 import android.content.Context
-import androidx.annotation.StringRes
 import com.quickbirdstudios.surveykit.FinishReason
 import com.quickbirdstudios.surveykit.StepIdentifier
-import com.quickbirdstudios.surveykit.backend.views.question_parts.AnimatedCheckmark
+import com.quickbirdstudios.surveykit.backend.views.question_parts.QuestionAnimation
 import com.quickbirdstudios.surveykit.backend.views.step.QuestionView
 import com.quickbirdstudios.surveykit.result.question_results.FinishQuestionResult
+import com.quickbirdstudios.surveykit.steps.CompletionStep
 
-//TODO pass title and text into constructor since it can not be changed afterwards.
-class FinishQuestionView(
+internal class FinishQuestionView(
     context: Context,
     id: StepIdentifier = StepIdentifier(),
-    @StringRes private val title: Int?,
-    @StringRes private val text: Int?,
-    @StringRes private val finishButtonText: Int
+    title: String?,
+    text: String?,
+    finishButtonText: String,
+    private val lottieAnimation: CompletionStep.LottieAnimation?,
+    private val repeatCount: Int?
 ) : QuestionView(context, id, false, title, text, finishButtonText) {
 
     //region Overrides
@@ -22,16 +23,15 @@ class FinishQuestionView(
     override fun createResults() =
         FinishQuestionResult(id, startDate)
 
-    override fun setState() {}
-
     override fun isValidInput() = true
 
     override fun setupViews() {
         super.setupViews()
-
         content.add(
-            AnimatedCheckmark(
-                context
+            QuestionAnimation(
+                context = context,
+                animation = lottieAnimation,
+                repeatCount = repeatCount
             )
         )
 

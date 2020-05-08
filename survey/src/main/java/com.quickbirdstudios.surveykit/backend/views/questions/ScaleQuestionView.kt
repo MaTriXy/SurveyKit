@@ -13,9 +13,9 @@ internal class ScaleQuestionView(
     context: Context,
     id: StepIdentifier,
     isOptional: Boolean,
-    @StringRes title: Int?,
-    @StringRes text: Int?,
-    @StringRes nextButtonText: Int,
+    title: String?,
+    text: String?,
+    nextButtonText: String,
     private val answerFormat: AnswerFormat.ScaleAnswerFormat,
     private val preselected: Float? = null
 ) : QuestionView(context, id, isOptional, title, text, nextButtonText) {
@@ -38,11 +38,6 @@ internal class ScaleQuestionView(
             stringIdentifier = scalePart.selected.toString()
         )
 
-    override fun setState() {
-        val scaleState = (state as? ScaleQuestionResult)?.answer ?: return
-        scalePart.selected = scaleState
-    }
-
     override fun isValidInput(): Boolean = true
 
     //endregion
@@ -53,8 +48,8 @@ internal class ScaleQuestionView(
     override fun setupViews() {
         super.setupViews()
 
-        val minimumValueDescription = context.getString(answerFormat.minimumValueDescription)
-        val maximumValueDescription = context.getString(answerFormat.maximumValueDescription)
+        val minimumValueDescription = answerFormat.minimumValueDescription
+        val maximumValueDescription = answerFormat.maximumValueDescription
 
         val minValueDescription =
             if (minimumValueDescription.isNotBlank())

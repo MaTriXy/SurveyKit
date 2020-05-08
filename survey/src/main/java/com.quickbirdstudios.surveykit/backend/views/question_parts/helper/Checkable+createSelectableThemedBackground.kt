@@ -9,7 +9,7 @@ import android.view.Gravity
 import android.widget.Checkable
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
-import com.quickbirdstudios.survey.R
+import com.quickbirdstudios.surveykit.R
 import com.quickbirdstudios.surveykit.backend.helpers.extensions.px
 
 @Suppress("unused")
@@ -36,9 +36,7 @@ private class BackgroundCreationHelper {
             listOf(android.R.attr.state_checked, android.R.attr.state_pressed).toIntArray(),
             createLayerDrawable(
                 context,
-                BackgroundDrawable.Pressed(
-                    border
-                ),
+                BackgroundDrawable.Pressed(border),
                 IconDrawable.Check(),
                 color
             )
@@ -47,9 +45,7 @@ private class BackgroundCreationHelper {
             listOf(android.R.attr.state_pressed).toIntArray(),
             createLayerDrawable(
                 context,
-                BackgroundDrawable.Pressed(
-                    border
-                ),
+                BackgroundDrawable.Pressed(border),
                 IconDrawable.Default(),
                 color
             )
@@ -58,9 +54,7 @@ private class BackgroundCreationHelper {
             listOf(android.R.attr.state_checked).toIntArray(),
             createLayerDrawable(
                 context,
-                BackgroundDrawable.Default(
-                    border
-                ),
+                BackgroundDrawable.Default(border),
                 IconDrawable.Check(),
                 color
             )
@@ -69,9 +63,7 @@ private class BackgroundCreationHelper {
             emptyArray<Int>().toIntArray(),
             createLayerDrawable(
                 context,
-                BackgroundDrawable.Default(
-                    border
-                ),
+                BackgroundDrawable.Default(border),
                 IconDrawable.Default(),
                 color
             )
@@ -106,18 +98,19 @@ private class BackgroundCreationHelper {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 layerDrawable.setLayerGravity(1, Gravity.CENTER_VERTICAL or Gravity.END)
                 layerDrawable.setLayerInset(
-                    1, 0,
+                    1,
+                    0,
+                    context.px(8).toInt(),
                     context.px(20).toInt(),
-                    context.px(20).toInt(),
-                    context.px(20).toInt()
+                    context.px(8).toInt()
                 )
             } else {
                 layerDrawable.setLayerInset(
                     1,
                     context.px(320).toInt(),
+                    context.px(8).toInt(),
                     context.px(20).toInt(),
-                    context.px(20).toInt(),
-                    context.px(20).toInt()
+                    context.px(8).toInt()
                 )
             }
         }
@@ -147,15 +140,15 @@ internal enum class BackgroundDrawable {
 
     @DrawableRes
     operator fun invoke(border: Border): Int = when (border) {
-        Border.Top -> when (this) {
-            Default -> R.drawable.input_border_top_border
-            Pressed -> R.drawable.input_border_top_border_pressed
-        }
         Border.Both -> when (this) {
             Default -> R.drawable.input_border
             Pressed -> R.drawable.input_border_pressed
         }
+        Border.Bottom -> when (this) {
+            Default -> R.drawable.input_border_bottom_border
+            Pressed -> R.drawable.input_border_bottom_border_pressed
+        }
     }
 
-    enum class Border { Top, Both }
+    enum class Border { Both, Bottom }
 }

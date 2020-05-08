@@ -32,7 +32,4 @@ dependencies {
     /* Android Support */
     implementation(Deps.AndroidSupport.appCompat)
     implementation(Deps.AndroidSupport.constraint)
-
-    /* Test */
-    implementation(Deps.Test.junit)
 }

@@ -6,6 +6,7 @@ import android.os.Parcelable
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
@@ -22,90 +23,130 @@ import com.quickbirdstudios.surveykit.steps.QuestionStep
 import com.quickbirdstudios.surveykit.steps.Step
 import com.quickbirdstudios.surveykit.survey.SurveyView
 import kotlinx.android.parcel.Parcelize
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import java.util.*
-import kotlin.coroutines.CoroutineContext
 
 
-class MainActivity : AppCompatActivity(), CoroutineScope {
+class MainActivity : AppCompatActivity() {
 
-    private lateinit var survey: SurveyView
-
-    override val coroutineContext: CoroutineContext = Job() + Dispatchers.Main
+    protected lateinit var survey: SurveyView
+    private lateinit var container: ViewGroup
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
 
         survey = findViewById(R.id.survey_view)
+        container = findViewById(R.id.surveyContainer)
         setupSurvey(survey)
     }
-
 
     private fun setupSurvey(surveyView: SurveyView) {
         val steps = listOf(
             InstructionStep(
-                title = R.string.intro_title,
-                text = R.string.intro_text,
-                buttonText = R.string.intro_start
+                title = this.resources.getString(R.string.intro_title),
+                text = this.resources.getString(R.string.intro_text),
+                buttonText = this.resources.getString(R.string.intro_start)
             ),
             QuestionStep(
-                title = R.string.about_you_question_title,
-                text = R.string.about_you_question_text,
-                answerFormat = AnswerFormat.TextAnswerFormat(
-                    multipleLines = true,
-                    maximumLength = 100
-                )
+                title = this.resources.getString(R.string.about_you_question_title),
+                text = this.resources.getString(R.string.about_you_question_text),
+                answerFormat = AnswerFormat.TextAnswerFormat(maxLines = 5)
             ),
             QuestionStep(
-                title = R.string.how_old_title,
-                text = R.string.how_old_text,
+                title = this.resources.getString(R.string.how_old_title),
+                text = this.resources.getString(R.string.how_old_text),
                 answerFormat = AnswerFormat.IntegerAnswerFormat(
                     defaultValue = 25,
-                    hint = R.string.how_old_hint
+                    hint = this.resources.getString(R.string.how_old_hint)
                 )
             ),
             QuestionStep(
-                title = R.string.how_fat_question_title,
-                text = R.string.how_fat_question_text,
+                title = this.resources.getString(R.string.how_fat_question_title),
+                text = this.resources.getString(R.string.how_fat_question_text),
                 answerFormat = AnswerFormat.ScaleAnswerFormat(
                     minimumValue = 1,
                     maximumValue = 5,
-                    minimumValueDescription = R.string.how_fat_min,
-                    maximumValueDescription = R.string.how_fat_max,
+                    minimumValueDescription = this.resources.getString(R.string.how_fat_min),
+                    maximumValueDescription = this.resources.getString(R.string.how_fat_max),
                     step = 1f,
                     defaultValue = 3
                 )
             ),
             QuestionStep(
-                title = R.string.allergies_question_title,
-                text = R.string.allergies_question_text,
+                title = this.resources.getString(R.string.allergies_question_title),
+                text = this.resources.getString(R.string.allergies_question_text),
                 answerFormat = AnswerFormat.MultipleChoiceAnswerFormat(
                     textChoices = listOf(
-                        TextChoice(R.string.allergies_back_penicillin),
-                        TextChoice(R.string.allergies_latex),
-                        TextChoice(R.string.allergies_pet),
-                        TextChoice(R.string.allergies_pollen)
+                        TextChoice(this.resources.getString(R.string.allergies_back_penicillin)),
+                        TextChoice(this.resources.getString(R.string.allergies_latex)),
+                        TextChoice(this.resources.getString(R.string.allergies_pet)),
+                        TextChoice(this.resources.getString(R.string.allergies_pollen))
                     )
                 )
             ),
             QuestionStep(
-                title = R.string.quit_or_continue_question_title,
-                text = R.string.quit_or_continue_question_text,
+                title = this.resources.getString(R.string.quit_or_continue_question_title),
+                text = this.resources.getString(R.string.quit_or_continue_question_text),
                 answerFormat = AnswerFormat.SingleChoiceAnswerFormat(
                     textChoices = listOf(
-                        TextChoice(R.string.yes),
-                        TextChoice(R.string.no)
+                        TextChoice(this.resources.getString(R.string.yes)),
+                        TextChoice(this.resources.getString(R.string.no))
                     )
                 )
             ),
             CustomStep(),
+            QuestionStep(
+                title = this.resources.getString(R.string.boolean_example_title),
+                text = this.resources.getString(R.string.boolean_example_text),
+                answerFormat = AnswerFormat.BooleanAnswerFormat(
+                    positiveAnswerText = this.resources.getString(R.string.how_fat_min),
+                    negativeAnswerText = this.resources.getString(R.string.how_fat_max),
+                    defaultValue = AnswerFormat.BooleanAnswerFormat.Result.NegativeAnswer
+                )
+            ),
+            QuestionStep(
+                title = this.resources.getString(R.string.value_picker_example_title),
+                text = this.resources.getString(R.string.value_picker_example_text),
+                answerFormat = AnswerFormat.ValuePickerAnswerFormat(
+                    choices = (0..10).toList().map { it.toString() },
+                    defaultValue = 5.toString()
+                )
+            ),
+            QuestionStep(
+                title = this.resources.getString(R.string.date_picker_title),
+                text = this.resources.getString(R.string.date_picker_text),
+                answerFormat = AnswerFormat.DateAnswerFormat()
+            ),
+            QuestionStep(
+                title = this.resources.getString(R.string.time_picker_title),
+                text = this.resources.getString(R.string.time_picker_text),
+                answerFormat = AnswerFormat.TimeAnswerFormat()
+            ),
+            QuestionStep(
+                title = this.resources.getString(R.string.email_question_title),
+                text = this.resources.getString(R.string.email_question_text),
+                answerFormat = AnswerFormat.EmailAnswerFormat()
+            ),
+            QuestionStep(
+                title = this.resources.getString(R.string.image_selector_question_title),
+                text = this.resources.getString(R.string.image_selector_question_text),
+                answerFormat = AnswerFormat.ImageSelectorFormat(
+                    numberOfColumns = 5,
+                    defaultSelectedImagesIndices = listOf(1, 3),
+                    imageChoiceList = listOf(
+                        ImageChoice(R.drawable.color1),
+                        ImageChoice(R.drawable.color2),
+                        ImageChoice(R.drawable.color3),
+                        ImageChoice(R.drawable.color4),
+                        ImageChoice(R.drawable.color5),
+                        ImageChoice(R.drawable.color6)
+                    )
+                )
+            ),
             CompletionStep(
-                title = R.string.finish_question_title,
-                text = R.string.finish_question_text,
-                buttonText = R.string.finish_question_submit
+                title = this.resources.getString(R.string.finish_question_title),
+                text = this.resources.getString(R.string.finish_question_text),
+                buttonText = this.resources.getString(R.string.finish_question_submit)
             )
         )
 
@@ -135,6 +176,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             if (reason == FinishReason.Completed) {
                 taskResult.results.forEach { stepResult ->
                     Log.e("ASDF", "answer ${stepResult.results.firstOrNull()}")
+                    container.removeAllViews()
                 }
             }
         }
@@ -167,7 +209,7 @@ class CustomStep : Step {
 
             override fun setupViews() = Unit
 
-            val root = View.inflate(context, R.layout.example, this)
+            val root = View.inflate(context, R.layout.custom_step, this)
 
             override fun createResults(): QuestionResult =
                 CustomResult(
@@ -192,9 +234,9 @@ class CustomStep : Step {
                     .setOnClickListener { onNextListener(createResults()) }
                 root.findViewById<Button>(R.id.back_button)
                     .setOnClickListener { onBackListener(createResults()) }
-                root.findViewById<Button>(R.id.close)
+                root.findViewById<Button>(R.id.close_button)
                     .setOnClickListener { onCloseListener(createResults(), FinishReason.Completed) }
-                root.findViewById<Button>(R.id.skip)
+                root.findViewById<Button>(R.id.skip_button)
                     .setOnClickListener { onSkipListener() }
                 root.findViewById<EditText>(R.id.input).setText(
                     (stepResult?.results?.firstOrNull() as? CustomResult)?.customData ?: ""

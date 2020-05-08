@@ -1,7 +1,6 @@
 package com.quickbirdstudios.surveykit.backend.views.questions
 
 import android.content.Context
-import androidx.annotation.StringRes
 import com.quickbirdstudios.surveykit.AnswerFormat
 import com.quickbirdstudios.surveykit.StepIdentifier
 import com.quickbirdstudios.surveykit.TextChoice
@@ -14,9 +13,9 @@ internal class MultipleChoiceQuestionView(
     context: Context,
     id: StepIdentifier,
     isOptional: Boolean,
-    @StringRes title: Int?,
-    @StringRes text: Int?,
-    @StringRes nextButtonText: Int,
+    title: String?,
+    text: String?,
+    nextButtonText: String,
     private val answerFormat: AnswerFormat.MultipleChoiceAnswerFormat,
     private val preselected: List<TextChoice>?
 ) : QuestionView(context, id, isOptional, title, text, nextButtonText) {
@@ -38,35 +37,25 @@ internal class MultipleChoiceQuestionView(
             answer = choicesContainer.selected,
             stringIdentifier = choicesContainer.selected
                 .map { it.value }
-                .joinToString(",") { context.getString(it) }
+                .joinToString(",")
         )
 
-    override fun setState() {
-        val multipleChoiceQuestionResult =
-            (state as? MultipleChoiceQuestionResult)?.answer ?: return
-        choicesContainer.selected = multipleChoiceQuestionResult
-    }
-
     override fun isValidInput(): Boolean = isOptional || choicesContainer.isOneSelected()
-
-    //endregion
-
-
-    //region Private API
 
     override fun setupViews() {
         super.setupViews()
 
-        choicesContainer = content.add(
-            MultipleChoicePart(
-                context
-            )
-        )
+        choicesContainer = content.add(MultipleChoicePart(context))
         choicesContainer.options = answerFormat.textChoices
         choicesContainer.onCheckedChangeListener = { _, _ -> footer.canContinue = isValidInput() }
-        choicesContainer.selected = preselected ?: emptyList()
+        val preselectedOptions = preselected ?: emptyList()
+        val selectedOptions =
+            if (preselectedOptions.isNotEmpty()) preselectedOptions
+            else answerFormat.defaultSelections
+        choicesContainer.selected = selectedOptions
     }
 
     //endregion
+
 
 }

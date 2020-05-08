@@ -20,6 +20,10 @@ android {
         targetSdkVersion(Project.Android.targetSdkVersion)
         testInstrumentationRunner = Project.Android.testInstrumentationRunner
     }
+
+    testOptions {
+        animationsDisabled = true
+    }
 }
 
 dependencies {
@@ -28,7 +32,12 @@ dependencies {
     implementation(Deps.Kotlin.androidCoroutines)
     implementation(Deps.AndroidSupport.appCompat)
     implementation(Deps.AndroidSupport.constraint)
+    implementation(Deps.AndroidSupport.recyclerView)
     implementation(Deps.lottie)
+
+
+    testImplementation(Deps.Test.jUnitJupiter)
+    testImplementation(Deps.Test.jUnitPlatform)
 }
 
 project.configureLibraryPublication()
