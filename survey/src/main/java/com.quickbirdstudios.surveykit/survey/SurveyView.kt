@@ -15,15 +15,16 @@ import com.quickbirdstudios.surveykit.backend.result_gatherer.ResultGathererImpl
 import com.quickbirdstudios.surveykit.result.StepResult
 import com.quickbirdstudios.surveykit.result.TaskResult
 import com.quickbirdstudios.surveykit.steps.Step
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 
 class SurveyView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleRes: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleRes), Survey, CoroutineScope {
-
 
     //region Members
 
@@ -36,21 +37,20 @@ class SurveyView @JvmOverloads constructor(
 
     //region Public API
 
-    //TODO theme should be not set here but when creating the survey
+    // TODO theme should be not set here but when creating the survey
     override fun start(task: Task, surveyTheme: SurveyTheme) {
         taskNavigator = TaskNavigator(task = task)
         resultGatherer = ResultGathererImpl(task = task)
         presenter = PresenterImpl(
             context = context,
             surveyTheme = surveyTheme,
-            viewContainer = this
+            viewContainer = this,
+            taskNavigator = taskNavigator
         )
-
         startSurvey()
     }
 
     //endregion
-
 
     //region Public API
 
@@ -82,7 +82,6 @@ class SurveyView @JvmOverloads constructor(
                 }
             }
         }
-
     }
 
     override fun backPressed() {
@@ -91,7 +90,6 @@ class SurveyView @JvmOverloads constructor(
 
     //endregion
 
-
     //region Overrides
 
     override var onStepResult: (Step?, StepResult?) -> Unit = { _, _ -> }
@@ -99,7 +97,6 @@ class SurveyView @JvmOverloads constructor(
     override var onSurveyFinish: (TaskResult, FinishReason) -> Unit = { _, _ -> }
 
     //endregion
-
 
     //region Private API
 
@@ -157,6 +154,7 @@ class SurveyView @JvmOverloads constructor(
         val newResult = presenter(
             Presenter.Transition.SlideFromRight, newStep, resultGatherer.retrieve(newStep.id)
         ).storeResult()
+
         return StepData(
             step = newStep,
             action = newResult
@@ -174,7 +172,6 @@ class SurveyView @JvmOverloads constructor(
 
     //endregion
 
-
     //region SubTypes
 
     private sealed class StepData {
@@ -182,11 +179,14 @@ class SurveyView @JvmOverloads constructor(
         data class Previous(val step: Step, val result: StepResult) : StepData()
         data class Skip(val step: Step) : StepData()
         data class Finish(
-            val step: Step, val stepResult: StepResult, val finishReason: FinishReason
+            val step: Step,
+            val stepResult: StepResult,
+            val finishReason: FinishReason
         ) : StepData()
 
         data class ClosePreemptively(
-            val stepResult: StepResult?, val finishReason: FinishReason
+            val stepResult: StepResult?,
+            val finishReason: FinishReason
         ) : StepData()
 
         companion object {

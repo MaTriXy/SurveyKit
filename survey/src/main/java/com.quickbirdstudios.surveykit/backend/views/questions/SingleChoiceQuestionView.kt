@@ -16,17 +16,16 @@ internal class SingleChoiceQuestionView(
     title: String?,
     text: String?,
     nextButtonText: String,
+    skipButtonText: String,
     private val answerFormat: AnswerFormat.SingleChoiceAnswerFormat,
     private val preselected: TextChoice? = null
-) : QuestionView(context, id, isOptional, title, text, nextButtonText) {
-
+) : QuestionView(context, id, isOptional, title, text, nextButtonText, skipButtonText) {
 
     //region Members
 
     private lateinit var choicesContainer: SingleChoicePart
 
     //endregion
-
 
     //region Overrides
 
@@ -48,7 +47,6 @@ internal class SingleChoiceQuestionView(
 
     //endregion
 
-
     //region Private API
 
     override fun setupViews() {
@@ -61,5 +59,4 @@ internal class SingleChoiceQuestionView(
     }
 
     //endregion
-
 }

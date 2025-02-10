@@ -1,13 +1,12 @@
 package com.quickbirdstudios.surveykit.backend.views.questions
 
 import android.content.Context
-import androidx.annotation.StringRes
 import com.quickbirdstudios.surveykit.AnswerFormat
-import com.quickbirdstudios.surveykit.R
 import com.quickbirdstudios.surveykit.StepIdentifier
 import com.quickbirdstudios.surveykit.backend.helpers.extensions.afterTextChanged
 import com.quickbirdstudios.surveykit.backend.views.question_parts.TextFieldPart
 import com.quickbirdstudios.surveykit.backend.views.step.QuestionView
+import com.quickbirdstudios.surveykit.extensions.getNonNullText
 import com.quickbirdstudios.surveykit.result.QuestionResult
 import com.quickbirdstudios.surveykit.result.question_results.TextQuestionResult
 
@@ -18,17 +17,16 @@ internal class TextQuestionView(
     title: String?,
     text: String?,
     nextButtonText: String,
+    skipButtonText: String,
     private val answerFormat: AnswerFormat.TextAnswerFormat,
     private val preselected: String? = null
-) : QuestionView(context, id, isOptional, title, text, nextButtonText) {
-
+) : QuestionView(context, id, isOptional, title, text, nextButtonText, skipButtonText) {
 
     //region Members
 
     private lateinit var questionAnswerView: TextFieldPart
 
     //endregion
-
 
     //region Overrides
 
@@ -44,7 +42,7 @@ internal class TextQuestionView(
         answerFormat.isValid?.let { isValidCheck ->
             if (!isValidCheck(questionAnswerView.field.text.toString())) return false
         }
-        return questionAnswerView.field.text.isNotBlank()
+        return questionAnswerView.field.getNonNullText().isNotBlank()
     }
 
     override fun setupViews() {
@@ -59,6 +57,4 @@ internal class TextQuestionView(
     }
 
     //endregion
-
-
 }

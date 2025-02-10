@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
+import androidx.test.rule.GrantPermissionRule
 import com.quickbirdstudios.surveykit.AnswerFormat
 import com.quickbirdstudios.surveykit.AnswerFormat.MultipleChoiceAnswerFormat
 import com.quickbirdstudios.surveykit.AnswerFormat.SingleChoiceAnswerFormat
@@ -13,12 +14,27 @@ import com.quickbirdstudios.surveykit.FinishReason
 import com.quickbirdstudios.surveykit.result.TaskResult
 import com.quickbirdstudios.surveykit.result.question_results.*
 import com.quickbirdstudios.test.pages.*
+import com.quickbirdstudios.test.pages.PageTest
+import com.quickbirdstudios.test.pages.testBooleanChoiceStep
+import com.quickbirdstudios.test.pages.testCompletionStep
+import com.quickbirdstudios.test.pages.testCustomStep
+import com.quickbirdstudios.test.pages.testDatePickerStep
+import com.quickbirdstudios.test.pages.testEmailStep
+import com.quickbirdstudios.test.pages.testImageSelectorStep
+import com.quickbirdstudios.test.pages.testIntroStep
+import com.quickbirdstudios.test.pages.testMultipleChoiceStep
+import com.quickbirdstudios.test.pages.testNumberStep
+import com.quickbirdstudios.test.pages.testScaleStep
+import com.quickbirdstudios.test.pages.testSingleChoiceStep
+import com.quickbirdstudios.test.pages.testTextStep
+import com.quickbirdstudios.test.pages.testTimePickerStep
+import com.quickbirdstudios.test.pages.testValuePickerStep
+import java.util.Calendar
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -33,9 +49,14 @@ internal class FullSurveyTest : PageTest {
     @get:Rule
     var activityRule: ActivityTestRule<TestActivity> = ActivityTestRule(TestActivity::class.java)
 
+    @get:Rule
+    var permissionRule = GrantPermissionRule.grant(
+        android.Manifest.permission.ACCESS_FINE_LOCATION,
+        android.Manifest.permission.ACCESS_COARSE_LOCATION
+    )
+
     @Before
     fun setup() {
-
     }
 
     @Test
@@ -75,6 +96,9 @@ internal class FullSurveyTest : PageTest {
 
         testImageSelectorStep(ImageSelectorStepToClick)
 
+        // TODO does not work on the CI
+//        testLocationPickerTestStep("test1", activityRule)
+
         testCustomStep()
 
         testCompletionStep()
@@ -101,16 +125,18 @@ internal class FullSurveyTest : PageTest {
                         Assert.assertTrue(questionResult.answer.toString() == NumberStepInput)
                     is MultipleChoiceQuestionResult -> {
                         val expectedResult = listOf(
-                            (activityRule
-                                .activity
-                                .multipleChoiceStep
-                                .answerFormat as MultipleChoiceAnswerFormat
-                                ).textChoices[0],
-                            (activityRule
-                                .activity
-                                .multipleChoiceStep
-                                .answerFormat as MultipleChoiceAnswerFormat
-                                ).textChoices[3]
+                            (
+                                    activityRule
+                                        .activity
+                                        .multipleChoiceStep
+                                        .answerFormat as MultipleChoiceAnswerFormat
+                                    ).textChoices[0],
+                            (
+                                    activityRule
+                                        .activity
+                                        .multipleChoiceStep
+                                        .answerFormat as MultipleChoiceAnswerFormat
+                                    ).textChoices[3]
                         )
                         Assert.assertArrayEquals(
                             expectedResult.toTypedArray(),
@@ -150,6 +176,13 @@ internal class FullSurveyTest : PageTest {
                         ImageSelectorStepToClick + ImageSelectorStepPreselected,
                         questionResult.answer
                     )
+                    is LocationQuestionResult -> {
+                        Assert.assertEquals(questionResult.answer?.latitude ?: 0.0, 1.0, 0.00001)
+                        Assert.assertEquals(
+                            questionResult.answer?.latitude ?: 0.0,
+                            questionResult.answer?.longitude ?: 0.0, 0.00001
+                        )
+                    }
                     is CustomResult -> println(questionResult)
                     is FinishQuestionResult -> Unit
                 }

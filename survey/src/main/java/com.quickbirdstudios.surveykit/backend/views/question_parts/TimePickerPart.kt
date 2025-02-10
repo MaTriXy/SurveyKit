@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.util.AttributeSet
 import android.view.Gravity
+import android.view.MotionEvent
 import android.widget.LinearLayout
 import android.widget.TimePicker
 import com.quickbirdstudios.surveykit.R
@@ -12,7 +13,8 @@ import com.quickbirdstudios.surveykit.backend.views.main_parts.StyleablePart
 
 @Suppress("DEPRECATION")
 internal class TimePickerPart @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null
 ) : LinearLayout(context, attrs), StyleablePart {
 
     //region Members
@@ -71,8 +73,13 @@ internal class TimePickerPart @JvmOverloads constructor(
             }
         }
 
-
     //endregion
+
+    override fun onInterceptTouchEvent(motionEvent: MotionEvent?): Boolean {
+        if (motionEvent?.actionMasked == MotionEvent.ACTION_DOWN)
+            parent?.requestDisallowInterceptTouchEvent(true)
+        return false
+    }
 
     init {
         this.gravity = Gravity.CENTER
@@ -80,5 +87,4 @@ internal class TimePickerPart @JvmOverloads constructor(
         timePicker = TimePicker(context).apply { id = R.id.timePickerPart }
         this.addView(timePicker)
     }
-
 }

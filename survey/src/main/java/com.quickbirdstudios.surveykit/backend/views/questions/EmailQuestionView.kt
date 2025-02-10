@@ -2,9 +2,7 @@ package com.quickbirdstudios.surveykit.backend.views.questions
 
 import android.content.Context
 import android.text.InputType
-import androidx.annotation.StringRes
 import com.quickbirdstudios.surveykit.AnswerFormat
-import com.quickbirdstudios.surveykit.R
 import com.quickbirdstudios.surveykit.StepIdentifier
 import com.quickbirdstudios.surveykit.backend.helpers.extensions.afterTextChanged
 import com.quickbirdstudios.surveykit.backend.views.question_parts.TextFieldPart
@@ -19,9 +17,10 @@ internal class EmailQuestionView(
     title: String?,
     text: String?,
     nextButtonText: String,
+    skipButtonText: String,
     private val answerFormat: AnswerFormat.EmailAnswerFormat,
     private val preselected: String? = null
-) : QuestionView(context, id, isOptional, title, text, nextButtonText) {
+) : QuestionView(context, id, isOptional, title, text, nextButtonText, skipButtonText) {
 
     //region Members
 
@@ -58,6 +57,4 @@ internal class EmailQuestionView(
     }
 
     //endregion
-
-
 }

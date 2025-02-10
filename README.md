@@ -1,3 +1,7 @@
+<p align="center">
+<img src="assets/top/surveykit-logo.png" width="500">
+</p>
+
 # SurveyKit: Create beautiful surveys on Android (inspired by ResearchKit Surveys on iOS)
 
 Do you want to display a questionnaire to get the opinion of your users? A survey for a medical trial? A series of instructions in a manual-like style? <br/>
@@ -33,6 +37,7 @@ This is an early version and work in progress. Do not hesitate to give feedback,
     -   [Evaluate the results](#evaluate-the-results)
     -   [Configure](#style)
     -   [Start the survey](#start-the-survey)
+-   [Location steps](#-location-steps)
 -   [Custom steps](#-custom-steps)
 -   [Comparison to ResearchKit on iOS](#vs-comparison-of-surveykit-on-android-to-researchkit-on-ios)
 -   [Author](#-author)
@@ -54,12 +59,13 @@ This is an early version and work in progress. Do not hesitate to give feedback,
 As stated before, this is an early version and a work in progress. We aim to extend this library until it matches the functionality of the [iOS ResearchKit Surveys](http://researchkit.org/docs/docs/Survey/CreatingSurveys.html).
 
 # 🏃 Library Setup
+> All of the available versions of SurveyKit has been moved to MavenCentral. 
 ## 1. Add the repository
-`build.gradle`
+SurveyKit is now available via MavenCentral which is normally added as part of every new Android project. However, if it is not present, you can add it as show here.
 ```groovy
 allprojects {
     repositories {
-        jcenter()
+        mavenCentral()
     }
 }
 ```
@@ -68,10 +74,10 @@ allprojects {
 `build.gradle.kts`
 ````kotlin
 dependencies {
-    implementation(project("com.quickbirdstudios:surveykit:0.1.0"))
+    implementation(project("com.quickbirdstudios:surveykit:1.1.0"))
 }
 ````
-Find the latest version [HERE](https://bintray.com/quickbirdstudios/android/SurveyKit)
+Find the [latest version](https://search.maven.org/artifact/com.quickbirdstudios/com.quickbirdstudios.surveykit) or [all releases](https://github.com/quickbirdstudios/SurveyKit/releases)
 
 
 # 💻 Usage
@@ -80,7 +86,7 @@ A working example project can be found [HERE](example/)
 ### Add and Find the Survey in the XML
 Add the SurveyView to your `xml` (it looks best if it fills the screen).
 ````xml
-<com.quickbirdstudios.survey_kit.public_api.survey.SurveyView
+<com.quickbirdstudios.survey_kit.survey.SurveyView
     android:id="@+id/survey_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent" />
@@ -137,6 +143,7 @@ The `answerFormat` specifies the type of question (the type of answer to the que
 -   `ScaleAnswerFormat`
 -   `SingleChoiceAnswerFormat`
 -   `MultipleChoiceAnswerFormat`
+-   `LocationAnswerFormat`
 
 All that's left is to collect your steps in a list.
 ```kotlin
@@ -213,6 +220,65 @@ All that's left is to start the survey and enjoy.🎉🎊
 ```kotlin
 surveyView.start(task, configuration)
 ```
+
+# Cancel Survey dialog
+
+When you cancel the survey, there is an option to change dialog default Strings. Must be imported from resources.
+
+```
+val configuration = SurveyTheme(
+            themeColorDark = ContextCompat.getColor(this, R.color.cyan_dark),
+            themeColor = ContextCompat.getColor(this, R.color.cyan_normal),
+            textColor = ContextCompat.getColor(this, R.color.cyan_text),
+            abortDialogConfiguration = AbortDialogConfiguration(
+                title = R.string.title,
+                message = R.string.message,
+                neutralMessage = R.string.no,
+                negativeMessage = R.string.yes
+            )
+        )
+```
+
+# 📍 Location steps
+You need add below to your own application `AndroidManifest.xml` file to use Google Map.
+```xml
+  <meta-data
+    android:name="com.google.android.gms.version"
+    android:value="@integer/google_play_services_version" />
+
+  <meta-data
+    android:name="com.google.android.maps.v2.API_KEY"
+    android:value="GOOGLE API KEY" />
+```
+
+Also need to append location permissions on `AndroidManifest.xml`. This is not required. But If you gave this permissions, map can select current location automatically.
+```xml
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+```
+
+
+You might wanna run location question steps test or example app on this project. Need to add api keys on `local.properties` file.
+```kotlin
+google_sdk_key="[API_KEY]"
+//if you want to use yandex address suggession on example app
+yandex_sdk_key="[API_KEY]"
+```
+
+And finally you can instante location question step like below.
+```kotlin
+QuestionStep(
+    title = "title",
+    text = this.resources.getString(R.string.location_question_text),
+    lifecycle = lifecycle,
+    answerFormat = AnswerFormat.LocationAnswerFormat(
+                    lifecycle = lifecycle,
+                    //addressProvider = YandexAddressSuggestionProvider(api_key)
+                )
+    )
+```
+Default address provider is `GeocoderAddressSuggestionProvider` based on `android.location.Geocoder`.
+If you want to use custom address provider. You can use `AddressSuggestionProvider` interface and make your own implements like `YandexAddressSuggestionProvider`.
 
 
 # 📇 Custom steps
@@ -301,7 +367,7 @@ The goal is to make both libraries match in terms of their functionality.
 | Text answer (validated)   | ✅                     | ✅             |
 | Scale answer              | ✅                     | ✅             |
 | Email answer              | ✅                     | ✅             |
-| Location answer           | ✅                     | x              |
+| Location answer           | ✅                     | ✅             |
 
 # 👤 Author
 This Android library is created with ❤️ by [QuickBird Studios](https://quickbirdstudios.com/).
@@ -310,6 +376,8 @@ This Android library is created with ❤️ by [QuickBird Studios](https://quick
 Open an issue if you need help, if you found a bug, or if you want to discuss a feature request.
 
 Open a PR if you want to make changes to SurveyKit.
+
+For the moment, a mandatory requirement for a PR to be accepted is also applying [ktlint](https://ktlint.github.io/) when submitting this PR.
 
 # 📃 License
 SurveyKit is released under an MIT license. See [License](LICENSE) for more information.

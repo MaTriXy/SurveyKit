@@ -10,6 +10,7 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.quickbirdstudios.surveykit.*
+import com.quickbirdstudios.surveykit.backend.views.main_parts.AbortDialogConfiguration
 import com.quickbirdstudios.surveykit.backend.views.step.StepView
 import com.quickbirdstudios.surveykit.result.QuestionResult
 import com.quickbirdstudios.surveykit.result.StepResult
@@ -38,6 +39,7 @@ internal class TestActivity : AppCompatActivity() {
     lateinit var timePickerStep: QuestionStep
     lateinit var emailStep: QuestionStep
     lateinit var imageSelectorStep: QuestionStep
+    lateinit var locationPickerStep: QuestionStep
     lateinit var completionStep: CompletionStep
     lateinit var customStep: CustomStep
     lateinit var allSteps: List<Step>
@@ -67,7 +69,13 @@ internal class TestActivity : AppCompatActivity() {
         val configuration = SurveyTheme(
             themeColorDark = ContextCompat.getColor(this, R.color.cyan_normal),
             themeColor = ContextCompat.getColor(this, R.color.cyan_normal),
-            textColor = ContextCompat.getColor(this, R.color.cyan_text)
+            textColor = ContextCompat.getColor(this, R.color.cyan_text),
+            abortDialogConfiguration = AbortDialogConfiguration(
+                R.string.abort_dialog_title,
+                R.string.abort_dialog_message,
+                R.string.abort_dialog_neutral_message,
+                R.string.abort_dialog_negative_message
+            )
         )
 
         surveyView.start(task, configuration)
@@ -84,14 +92,18 @@ internal class TestActivity : AppCompatActivity() {
             text = this.resources.getString(R.string.about_you_question_text),
             answerFormat = AnswerFormat.TextAnswerFormat(
                 maxLines = 5
-            )
+            ),
+            skipButtonText = getString(R.string.skip_here),
+            isOptional = true
         )
         intStep = QuestionStep(
             title = this.resources.getString(R.string.how_old_title),
             text = this.resources.getString(R.string.how_old_text),
             answerFormat = AnswerFormat.IntegerAnswerFormat(
                 defaultValue = 25,
-                hint = this.resources.getString(R.string.how_old_hint)
+                hint = this.resources.getString(R.string.how_old_hint),
+                boundary = 18..60,
+                errorText = this.resources.getString(R.string.invalid_age_error_text)
             )
         )
         scaleStep = QuestionStep(
@@ -194,6 +206,14 @@ internal class TestActivity : AppCompatActivity() {
                 )
             )
         )
+        locationPickerStep = QuestionStep(
+            title = this.resources.getString(R.string.location_picker_question_title),
+            text = this.resources.getString(R.string.location_picker_question_text),
+            answerFormat = AnswerFormat.LocationAnswerFormat(
+                lifecycle = lifecycle,
+                addressProvider = TestAddressProvider()
+            )
+        )
         completionStep = CompletionStep(
             title = this.resources.getString(R.string.finish_question_title),
             text = this.resources.getString(R.string.finish_question_text),
@@ -214,13 +234,12 @@ internal class TestActivity : AppCompatActivity() {
             timePickerStep,
             emailStep,
             imageSelectorStep,
+//            locationPickerStep, // TODO test for it does not work on the CI
             customStep,
             completionStep
         )
     }
-
 }
-
 
 class CustomStep : Step {
     override val isOptional: Boolean = true
@@ -277,7 +296,6 @@ class CustomStep : Step {
         }
     }
 }
-
 
 @Parcelize
 data class CustomResult(
